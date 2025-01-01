@@ -1,0 +1,10 @@
+
+
+services:
+  app:
+    build: .
+    container_name: test
+    volumes:
+      - ./logs:/app/logs
+    restart: always
+

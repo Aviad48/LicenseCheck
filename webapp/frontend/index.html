@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>License Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>License Manager</h1>
+  <button onclick="checkLicense()">Check License</button>
+  <button onclick="isLicenseExpired()">Is License Expired</button>
+  <button onclick="checkUsageCount()">Check Usage Count</button>
+
+  <p id="result"></p>
+
+  <script>
+    const user = "aviad"; // The user whose license status will be checked
+
+    async function checkLicense() {
+      const response = await fetch(`/checkLicense?user=${user}`);
+      const result = await response.json();
+      if (response.ok) {
+        document.getElementById('result').textContent = 
+          `License status for ${result.user}: ${result.licensed === 1 ? 'Licensed' : 'Not Licensed'}`;
+      } else {
+        document.getElementById('result').textContent = `Error: ${result.error}`;
+      }
+    }
+
+    async function isLicenseExpired() {
+      const response = await fetch(`/is_license_expired?user=${user}`);
+      const result = await response.json();
+      if (response.ok) {
+        document.getElementById('result').textContent = 
+          `License expiration status for ${result.user}: ${result.license_expired === 1 ? 'Expired' : 'Active'}`;
+      } else {
+        document.getElementById('result').textContent = `Error: ${result.error}`;
+      }
+    }
+
+    async function checkUsageCount() {
+      const response = await fetch(`/check_usage_count?user=${user}`);
+      const result = await response.json();
+      if (response.ok) {
+        document.getElementById('result').textContent = 
+          `Usage count for ${result.user}: ${result.usage_count}`;
+      } else {
+        document.getElementById('result').textContent = `Error: ${result.error}`;
+      }
+    }
+  </script>
+</body>
+</html>
