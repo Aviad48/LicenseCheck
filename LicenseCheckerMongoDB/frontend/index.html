@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #4CAF50;
+        }
+
+        a {
+            color: #4CAF50;
+        }
+
+        /* Container */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Forms */
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="email"], input[type="date"], button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* User Details Section */
+        #userDetails {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+
+        /* Media Queries */
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 15px;
+            }
+
+            input, button {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Management</h1>
+
+        <!-- Add User Form -->
+        <h2>Add User</h2>
+        <form id="addUserForm">
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" required>
+
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" required>
+
+            <label for="username">Username:</label>
+            <input type="text" id="username" required>
+            
+            
+            <label  for="email">Email:</label>
+            <input type="email" id="email" required>
+            
+
+            <label for="user_number">User Number:</label>
+            <input type="text" id="user_number" required>
+
+            <label for="license_codes">License Codes (comma separated):</label>
+            <input type="text" id="license_codes" required>
+
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" required>
+
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" required>
+
+            <button type="submit">Add User</button>
+        </form>
+
+        <!-- Delete User Form -->
+        <h2>Delete User</h2>
+        <form id="deleteUserForm">
+            <label for="delete_user_number">User Number:</label>
+            <input type="text" id="delete_user_number" required>
+            <button type="submit">Delete User</button>
+        </form>
+
+        <!-- Search User Form -->
+        <h2>Search User</h2>
+        <form id="searchUserForm">
+            <label for="search_user_number">User Number:</label>
+            <input type="text" id="search_user_number" required>
+            <button type="submit">Search User</button>
+        </form>
+
+        <div id="userDetails"></div>
+    </div>
+
+    <script>
+        // Add User with Frontend Validation
+        document.getElementById("addUserForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Get form data
+            const data = {
+                first_name: document.getElementById("first_name").value,
+                last_name: document.getElementById("last_name").value,
+                username: document.getElementById("username").value,
+                email: document.getElementById("email").value,
+                user_number: document.getElementById("user_number").value,
+                license_codes: document.getElementById("license_codes").value.split(","),
+                start_date: document.getElementById("start_date").value,
+                end_date: document.getElementById("end_date").value
+            };
+            
+
+            
+
+            // Frontend validation: Ensure all fields are provided
+            for (const key in data) {
+                if (!data[key]) {
+                    alert(`Please fill in the ${key.replace('_', ' ')} field.`);
+                    return;
+                }
+            }
+
+            fetch("/add_user", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }).then(response => response.json())
+              .then(data => alert(data.message))
+              .catch(error => alert("Error adding user"));
+        });
+
+        // Delete User
+        document.getElementById("deleteUserForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const data = { user_number: document.getElementById("delete_user_number").value };
+
+            fetch("http://18.207.123.224:5000/delete_user", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }).then(response => response.json())
+              .then(data => alert(data.message))
+              .catch(error => alert("Error deleting user"));
+        });
+
+        // Search User
+        document.getElementById("searchUserForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const user_number = document.getElementById("search_user_number").value;
+
+            fetch("http://18.207.123.224:5000/search_user", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ user_number })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.message) {
+                      document.getElementById("userDetails").innerHTML = data.message;
+                  } else {
+                      document.getElementById("userDetails").innerHTML = JSON.stringify(data, null, 2);
+                  }
+              })
+              .catch(error => alert("Error searching user"));
+        });
+    </script>
+</body>
+</html>

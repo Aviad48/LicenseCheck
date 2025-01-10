@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>License Checker</h1>
+    <button onclick="isLicenseExpired()">Is License Expired</button>
+    <button onclick="checkLicense()">Check License</button>
+    <button onclick="checkUsageCount()">Check Usage Count</button>
+    <div id="result"></div>
+
+    <script>
+        // Function to fetch the backend URL from config.json
+        const getBackendURL = async () => {
+            try {
+                const response = await fetch('/config.json');
+                const config = await response.json();
+                return config.backendURL;
+            } catch (error) {
+                document.getElementById('result').textContent = `Error loading backend URL: ${error.message}`;
+                throw error;
+            }
+        };
+
+        // Function to prompt user for their username
+        const getUsername = () => {
+            return new Promise((resolve) => {
+                const username = prompt("Please enter your username:");
+                resolve(username);
+            });
+        };
+
+        async function isLicenseExpired() {
+            const username = await getUsername(); // Prompt for username
+            if (!username) {
+                document.getElementById('result').textContent = "Username is required!";
+                return;
+            }
+
+            const backendURL = await getBackendURL();
+            try {
+                const response = await fetch(`${backendURL}/is_license_expired?user=${username}`);
+                const result = await response.json();
+                document.getElementById('result').textContent = response.ok
+                    ? `License Expired: ${result.license_expired === 1 ? 'Yes' : 'No'}`
+                    : `Error: ${result.error}`;
+            } catch (error) {
+                document.getElementById('result').textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function checkLicense() {
+            const username = await getUsername(); // Prompt for username
+            if (!username) {
+                document.getElementById('result').textContent = "Username is required!";
+                return;
+            }
+
+            const backendURL = await getBackendURL();
+            try {
+                const response = await fetch(`${backendURL}/checkLicense?user=${username}`);
+                const result = await response.json();
+                document.getElementById('result').textContent = response.ok
+                    ? `User Licensed: ${result.licensed === 1 ? 'Yes' : 'No'}`
+                    : `Error: ${result.error}`;
+            } catch (error) {
+                document.getElementById('result').textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function checkUsageCount() {
+            const username = await getUsername(); // Prompt for username
+            if (!username) {
+                document.getElementById('result').textContent = "Username is required!";
+                return;
+            }
+
+            const backendURL = await getBackendURL();
+            try {
+                const response = await fetch(`${backendURL}/check_usage_count?user=${username}`);
+                const result = await response.json();
+                document.getElementById('result').textContent = response.ok
+                    ? `Usage Count: ${result.usage_count}`
+                    : `Error: ${result.error}`;
+            } catch (error) {
+                document.getElementById('result').textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

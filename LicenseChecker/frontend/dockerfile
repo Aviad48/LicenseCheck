@@ -1,0 +1,12 @@
+# Use Nginx as the base image
+FROM nginx:alpine
+
+# Copy the HTML and configuration file to Nginx's default HTML directory
+COPY index.html /usr/share/nginx/html/
+COPY config.json /usr/share/nginx/html/
+
+# Expose Nginx port
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
